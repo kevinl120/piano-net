@@ -37,11 +37,10 @@ def from_fingering_file():
             path = 'data/FingeringFiles/005-2_fingering.txt'
 
         with open(path) as f:
+            all_lines = [line for line in f.readlines() if line[0] != '/']
             x_file = []
             y_file = []
-            for line in f.readlines():
-                if line[0] == '/':
-                    continue
+            for line in all_lines:
                 l = line.split('\t')
                 x_file.append([float(l[1]), float(l[2]), pitch_to_num(l[3])])
 
@@ -50,14 +49,11 @@ def from_fingering_file():
                     fingering.append(fingering[0])
                 fingering = map(lambda x: x + (5 if x < 0 else 4), fingering)
                 y_file.append(list(fingering))
-            y_file = keras.utils.to_categorical(y_file)
-
-            x_train.append(x_file)
-            y_train.append(y_file)
-            
+            for i in range(len(y_file)//10 - 2):
+                x_train.append(np.array(x_file[i*10:i*10+30]))
+                y_train.append(keras.utils.to_categorical(y_file[i*10:i*10+30], num_classes=10))
     x_train = np.array(x_train)
     y_train = np.array(y_train)
-
     pdb.set_trace()
             
 
