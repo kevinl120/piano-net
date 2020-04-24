@@ -51,10 +51,11 @@ def from_fingering_file():
                 y_file.append(list(fingering))
             for i in range(len(y_file)//10 - 2):
                 x_train.append(np.array(x_file[i*10:i*10+30]))
-                y_train.append(keras.utils.to_categorical(y_file[i*10:i*10+30], num_classes=10))
+                y_train.append(keras.utils.to_categorical(y_file[i*10+10:i*10+20], num_classes=10))
     x_train = np.array(x_train)
     y_train = np.array(y_train)
-    pdb.set_trace()
-            
+    y_train = np.reshape(y_train, (-1, 200))
 
-from_fingering_file()
+    return x_train, y_train
+
+# from_fingering_file()
