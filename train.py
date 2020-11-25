@@ -1,45 +1,37 @@
 from preprocess import from_fingering_file
 
-# from keras.losses import categorical_crossentropy
 import keras.backend as K
 from keras.layers import Input, Dense, Flatten, Conv1D, ReLU, concatenate
 from keras.models import Model, Sequential
 from keras.optimizers import Adam, SGD
 
-def custom_crossentropy(ytrue, ypred):
-    true_reshape = K.reshape(ytrue, (-1, 20, 10))
-    pred_reshape = K.reshape(ypred, (-1, 20, 10))
-    return K.categorical_crossentropy(true_reshape, pred_reshape)
-        
 
 def create_model():
     inputs = Input(shape=(30, 3))
     x = inputs
     x = Conv1D(64, 3, padding='same')(x)
     x = ReLU()(x)
+    x = Conv1D(64, 3, padding='same')(x)
+    x = ReLU()(x)
     x = Flatten()(x)
-    x = Dense(64, activation='relu')(x)
 
-    finger_outputs = []
-    for i in range(20):
-        finger_out = Dense(64, activation='relu')(x)
-        finger_out = Dense(10, activation='softmax', name='note{}_finger1_dense'.format(i))(finger_out)
-        finger_outputs.append(finger_out)
-    outputs = concatenate(finger_outputs)
-    model = Model(inputs=[inputs], outputs=[outputs])
+    x = Dense(64, activation='relu')(x)
+    finger_out = Dense(10, activation='softmax')(x)
+    model = Model(inputs=[inputs], outputs=finger_out)
     return model
 
 def train():
     model = create_model()
-    x_train, y_train = from_fingering_file()
-    opt = Adam(learning_rate=0.0001, beta_1=0.9, beta_2=0.999, amsgrad=False)
-    model.compile(loss=custom_crossentropy, optimizer=opt, metrics=['accuracy'])
+    x_train, y_train = from_fingering_file(start_file=0)
+    opt = Adam(learning_rate=0.001)
+#     opt = Adam(learning_rate=0.0001, beta_1=0.9, beta_2=0.999, amsgrad=False)
+    model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
     print(model.summary())
 
+    print(model.predict(x_train[0].reshape((-1, 30, 3))))
     # import pdb
     # pdb.set_trace()
-    # print(model.predict(x_train[0].reshape((-1, 30, 3))))
 
-    model.fit(x=x_train, y=y_train, batch_size=32, epochs=300)
-
+    model.fit(x=x_train, y=y_train, batch_size=32, epochs=10, validation_split=0.2)
+    
 train()
