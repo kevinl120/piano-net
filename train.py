@@ -30,7 +30,6 @@ def train():
     model = create_model()
     opt = Adam(learning_rate=0.001)
     model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
-    print(model.summary())
     
     print('accuracy before training:', accuracy_score(np.argmax(y_train, axis=1), np.argmax(model.predict(x_train), axis=1)))
     
@@ -44,4 +43,6 @@ def train():
 context = 5
 two_hand = False
 x_train, y_train = from_fingering_file(context=context, two_hand=two_hand)
+print(x_train.shape)
+print(y_train.shape)
 m = train()
