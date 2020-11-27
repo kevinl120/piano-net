@@ -8,10 +8,10 @@ from keras.utils import to_categorical
 
 
 def pitch_to_num(note):
-    """Takes a note of the form {PITCH}{ACCIDENTAL(s)}{OCTAVE} and turns it 
-    into the corresponding key number on the piano. E.g. A1=1, C4=40, F##4=47
+    """Takes a spelled pitch of the form {PITCH}{ACCIDENTAL(s)}{OCTAVE} and turns it 
+    into the corresponding key number on the piano. E.g. A0=1, C4=40, F##4=47
     """
-    pitch_map = {'A': 1, 'B': 3, 'C': 4, 'D': 6, 'E': 8, 'F': 9, 'G': 11}
+    pitch_map = {'A': 13, 'B': 15, 'C': 4, 'D': 6, 'E': 8, 'F': 9, 'G': 11}
     res = pitch_map[note[0]]
     if note[1] == '#':
         res += 1
@@ -33,6 +33,10 @@ def get_finger(f, two_hand=False):
     else:
         finger = abs(finger) - 1
     return finger
+
+
+def note_is_black(n):
+    return n%12==2 or n%12==4 or n%12==7 or n%12==9 or n%12==11
 
 
 def from_fingering_file(context=5, two_hand=False):
